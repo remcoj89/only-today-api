@@ -1,0 +1,7 @@
+export const POMODORO_DURATION_MINUTES = 25;
+export const BREAK_DURATION_MINUTES = 5;
+export const MAX_POMODOROS_PER_TASK = 6;
+export const DAY_AVAILABLE_HOURS_BEFORE = 24;
+export const DAY_LOCK_HOURS_AFTER = 48;
+export const CLOCK_SKEW_MAX_MINUTES = 10;
+export const CHECKIN_MAX_LENGTH = 500;
