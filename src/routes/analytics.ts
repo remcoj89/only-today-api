@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { AppError } from "../errors";
 import { validateRequest } from "../middleware/validateRequest";
 import { analyticsDateRangeSchema, analyticsYearSchema } from "../schemas/analytics";
@@ -13,7 +13,7 @@ import {
   getPomodoroUtilization
 } from "../services/analyticsService";
 
-export const analyticsRoutes = Router();
+export const analyticsRoutes: IRouter = Router();
 
 analyticsRoutes.get(
   "/completion-rates",

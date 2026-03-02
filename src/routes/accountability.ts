@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { AppError } from "../errors";
 import { validateRequest } from "../middleware/validateRequest";
 import {
@@ -19,7 +19,7 @@ import {
   removePair
 } from "../services/accountabilityService";
 
-export const accountabilityRoutes = Router();
+export const accountabilityRoutes: IRouter = Router();
 
 accountabilityRoutes.post(
   "/request",

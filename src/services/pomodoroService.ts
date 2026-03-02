@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import type { DocumentBase, DayContent, TaskItem, OtherTaskItem } from "../shared";
-import { DocType } from "../shared";
+import { DocStatus, DocType } from "../shared";
 import { AppError } from "../errors";
 import { getUserSettings } from "./userService";
 import { getDocument } from "./documentService";
@@ -112,7 +112,7 @@ async function saveDayContent(
       userId,
       docType: DocType.Day,
       docKey: dateKey,
-      status: "open",
+      status: DocStatus.Open,
       content,
       clientUpdatedAt: new Date().toISOString()
     });
@@ -137,15 +137,16 @@ function resolveTask(content: DayContent, reference: TaskReference): TaskLookup 
     if (reference.taskIndex === undefined || reference.taskIndex < 0 || reference.taskIndex > 2) {
       throw AppError.validationError("Invalid top three index", { taskIndex: reference.taskIndex });
     }
+    const taskIndex = reference.taskIndex;
     const tasks = [...content.planning.topThree];
-    const task = tasks[reference.taskIndex];
+    const task = tasks[taskIndex];
     if (!task) {
-      throw AppError.validationError("Top three task not found", { taskIndex: reference.taskIndex });
+      throw AppError.validationError("Top three task not found", { taskIndex });
     }
     return {
       task,
       updateTask: (next) => {
-        tasks[reference.taskIndex] = next as TaskItem;
+        tasks[taskIndex] = next as TaskItem;
         return {
           ...content,
           planning: { ...content.planning, topThree: tasks as [TaskItem, TaskItem, TaskItem] }
@@ -159,15 +160,16 @@ function resolveTask(content: DayContent, reference: TaskReference): TaskLookup 
   if (reference.taskIndex === undefined || reference.taskIndex < 0) {
     throw AppError.validationError("Invalid other task index", { taskIndex: reference.taskIndex });
   }
+  const taskIndex = reference.taskIndex;
   const otherTasks = [...content.planning.otherTasks];
-  const task = otherTasks[reference.taskIndex];
+  const task = otherTasks[taskIndex];
   if (!task) {
-    throw AppError.validationError("Other task not found", { taskIndex: reference.taskIndex });
+    throw AppError.validationError("Other task not found", { taskIndex });
   }
   return {
     task,
     updateTask: (next) => {
-      otherTasks[reference.taskIndex] = next as OtherTaskItem;
+      otherTasks[taskIndex] = next as OtherTaskItem;
       return {
         ...content,
         planning: { ...content.planning, otherTasks }

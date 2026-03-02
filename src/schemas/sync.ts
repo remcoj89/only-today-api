@@ -17,6 +17,9 @@ export const syncPushSchema = z.object({
   mutations: z.array(syncMutationSchema)
 });
 
+export type SyncPushBody = z.infer<typeof syncPushSchema>;
+export type SyncMutationParsed = z.infer<typeof syncMutationSchema>;
+
 export const syncPullQuerySchema = z.object({
   since: isoDateTime,
   docTypes: z.string().optional()

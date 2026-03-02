@@ -1,10 +1,10 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { AppError } from "../errors";
 import { validateRequest } from "../middleware/validateRequest";
 import { notificationDeviceParamsSchema, registerDeviceSchema } from "../schemas/notifications";
 import { registerDevice, unregisterDevice } from "../services/notificationService";
 
-export const notificationRoutes = Router();
+export const notificationRoutes: IRouter = Router();
 
 notificationRoutes.post(
   "/register-device",

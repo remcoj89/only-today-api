@@ -87,6 +87,7 @@ export interface DayContent {
   planning: PlanningContent;
   lifePillars: LifePillarsContent;
   dayClose: DayCloseContent;
+  [key: string]: unknown;
 }
 
 export interface WeekGoal {
@@ -119,15 +120,18 @@ export interface QuarterGoal {
 
 export interface WeekStartContent {
   weeklyGoals: WeekGoal[];
+  [key: string]: unknown;
 }
 
 export interface MonthStartContent {
   monthlyGoals: MonthGoal[];
+  [key: string]: unknown;
 }
 
 export interface QuarterStartContent {
   lifeWheel: LifeWheelScores;
   quarterGoals: QuarterGoal[];
+  [key: string]: unknown;
 }
 
 export interface LifeWheelScores {

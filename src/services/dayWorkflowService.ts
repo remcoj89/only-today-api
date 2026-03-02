@@ -1,6 +1,7 @@
 import { z, type ZodSchema } from "zod";
 import { subDays } from "date-fns";
 import {
+  DocStatus,
   DocType,
   type DayContent,
   type DocumentBase,
@@ -186,7 +187,7 @@ async function saveDayContent(
       userId,
       docType: DocType.Day,
       docKey: dateKey,
-      status: "open",
+      status: DocStatus.Open,
       content,
       clientUpdatedAt: new Date().toISOString()
     });

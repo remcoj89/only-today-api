@@ -133,7 +133,8 @@ export async function sendPushNotification(userId: string, notification: PushNot
             data: notification.data ?? {}
           })
         });
-        const payload = await response.json();
+        type ExpoPushResponse = { data?: { id?: string } };
+        const payload = (await response.json()) as ExpoPushResponse;
         const messageId = payload?.data?.id ?? null;
         return { success: response.ok, messageId };
       } catch {

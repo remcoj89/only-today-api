@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { DocType, type DayContent } from "../shared";
 import { AppError } from "../errors";
 import { validateRequest } from "../middleware/validateRequest";
@@ -10,7 +10,7 @@ import {
 } from "../schemas/documents";
 import { closeDay, getDocument, listDocuments, saveDocument } from "../services/documentService";
 
-export const documentRoutes = Router();
+export const documentRoutes: IRouter = Router();
 
 documentRoutes.get(
   "/:docType/:docKey",

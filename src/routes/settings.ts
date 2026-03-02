@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { AppError } from "../errors";
 import { validateRequest } from "../middleware/validateRequest";
 import {
@@ -16,7 +16,7 @@ import {
   updateUserSettings
 } from "../services/userService";
 
-export const settingsRoutes = Router();
+export const settingsRoutes: IRouter = Router();
 
 settingsRoutes.get("/", async (req, res, next) => {
   try {

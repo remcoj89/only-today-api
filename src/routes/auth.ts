@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { getSupabaseAdminClient, getSupabaseClient } from "../db/client";
 import { AppError } from "../errors";
 import { authMiddleware } from "../middleware/auth";
@@ -7,7 +7,7 @@ import { forgotPasswordSchema, loginSchema, refreshSchema, registerSchema } from
 import { createUserSettings } from "../services/userService";
 import { config } from "../config";
 
-export const authRoutes = Router();
+export const authRoutes: IRouter = Router();
 
 function logDebug(payload: { location: string; message: string; data?: Record<string, unknown> }) {
   // #region agent log

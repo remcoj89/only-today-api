@@ -1,11 +1,16 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { DocType } from "../shared";
 import { AppError } from "../errors";
 import { validateRequest } from "../middleware/validateRequest";
-import { syncFullSchema, syncPullQuerySchema, syncPushSchema } from "../schemas/sync";
+import {
+  type SyncPushBody,
+  syncFullSchema,
+  syncPullQuerySchema,
+  syncPushSchema
+} from "../schemas/sync";
 import { getChangedDocuments, processPushMutations } from "../services/syncService";
 
-export const syncRoutes = Router();
+export const syncRoutes: IRouter = Router();
 
 const MAX_PUSH_MUTATIONS = 100;
 const MAX_PULL_DOCUMENTS = 1000;
@@ -34,11 +39,11 @@ syncRoutes.post("/push", validateRequest({ body: syncPushSchema }), async (req, 
     if (!req.userId || !req.accessToken) {
       return next(AppError.unauthorized("Missing user context"));
     }
-    const { mutations } = req.body as { mutations: unknown[] };
-    if (mutations.length > MAX_PUSH_MUTATIONS) {
+    const body = req.body as SyncPushBody;
+    if (body.mutations.length > MAX_PUSH_MUTATIONS) {
       return next(AppError.rateLimited("Too many mutations in push request"));
     }
-    const results = await processPushMutations(req.userId, req.accessToken, req.body.mutations);
+    const results = await processPushMutations(req.userId, req.accessToken, body.mutations);
     return res.status(200).json({ success: true, data: { results } });
   } catch (err) {
     return next(err as Error);
@@ -70,15 +75,15 @@ syncRoutes.post("/full", validateRequest({ body: syncFullSchema }), async (req, 
     if (!req.userId || !req.accessToken) {
       return next(AppError.unauthorized("Missing user context"));
     }
-    const { push, pullSince } = req.body as { push: { mutations: unknown[] }; pullSince: string };
-    if (push.mutations.length > MAX_PUSH_MUTATIONS) {
+    const body = req.body as { push: SyncPushBody; pullSince: string };
+    if (body.push.mutations.length > MAX_PUSH_MUTATIONS) {
       return next(AppError.rateLimited("Too many mutations in push request"));
     }
-    const results = await processPushMutations(req.userId, req.accessToken, push.mutations);
+    const results = await processPushMutations(req.userId, req.accessToken, body.push.mutations);
     const pull = await getChangedDocuments(
       req.userId,
       req.accessToken,
-      pullSince,
+      body.pullSince,
       undefined,
       MAX_PULL_DOCUMENTS
     );

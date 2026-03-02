@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { AppError } from "../errors";
 import { validateRequest } from "../middleware/validateRequest";
 import {
@@ -34,7 +34,7 @@ import {
   startPomodoro
 } from "../services/pomodoroService";
 
-export const dayRoutes = Router();
+export const dayRoutes: IRouter = Router();
 
 dayRoutes.get(
   "/:dateKey/start/status",

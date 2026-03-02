@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { adminAuthMiddleware } from "../middleware/adminAuth";
 import { authMiddleware } from "../middleware/auth";
 import { adminRoutes } from "./admin";
@@ -13,7 +13,7 @@ import { periodRoutes } from "./periods";
 import { settingsRoutes } from "./settings";
 import { syncRoutes } from "./sync";
 
-export const routes = Router();
+export const routes: IRouter = Router();
 
 routes.use("/auth", authRoutes);
 routes.use("/accountability", authMiddleware, accountabilityRoutes);

@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type IRouter, Router } from "express";
 import { z } from "zod";
 import { AppError } from "../errors";
 import { validateRequest } from "../middleware/validateRequest";
@@ -10,7 +10,7 @@ import {
   unblockUser
 } from "../services/adminService";
 
-export const adminRoutes = Router();
+export const adminRoutes: IRouter = Router();
 
 const createUserSchema = z.object({
   email: z.string().email(),
