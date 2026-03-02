@@ -7,6 +7,11 @@ export type AppConfig = {
   supabaseServiceRoleKey: string;
   databaseUrl: string;
   nodeEnv: string;
+  enableScheduler: boolean;
+  corsOrigins: string[];
+  logLevel: string;
+  resendApiKey: string | null;
+  resendFromEmail: string;
 };
 
 function loadEnvFileIfPresent(filePath: string): void {
@@ -56,10 +61,23 @@ function requireEnv(key: string): string {
   return value;
 }
 
+function parseCorsOrigins(): string[] {
+  const raw = process.env.CORS_ORIGINS ?? "";
+  return raw
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+}
+
 export const config: AppConfig = {
   supabaseUrl: requireEnv("SUPABASE_URL"),
   supabaseAnonKey: requireEnv("SUPABASE_ANON_KEY"),
   supabaseServiceRoleKey: requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
   databaseUrl: requireEnv("DATABASE_URL"),
-  nodeEnv: process.env.NODE_ENV ?? "development"
+  nodeEnv: process.env.NODE_ENV ?? "development",
+  enableScheduler: process.env.ENABLE_SCHEDULER !== "false",
+  corsOrigins: parseCorsOrigins(),
+  logLevel: process.env.LOG_LEVEL ?? "info",
+  resendApiKey: process.env.RESEND_API_KEY ?? null,
+  resendFromEmail: process.env.RESEND_FROM_EMAIL ?? "Only Today <onboarding@resend.dev>"
 };

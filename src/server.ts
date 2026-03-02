@@ -2,21 +2,58 @@ import express from "express";
 import type { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
+import pino from "pino";
+import pinoHttp from "pino-http";
+import rateLimit from "express-rate-limit";
+import { config } from "./config";
 import { errorHandler } from "./errors";
 import { authMiddleware } from "./middleware/auth";
 import { routes } from "./routes";
+import { healthCheck } from "./db/client";
 
 export const app: Application = express();
 
+app.set("trust proxy", 1);
+
 app.use(helmet());
-app.use(cors());
+
+const corsOptions =
+  config.corsOrigins.length > 0
+    ? { origin: config.corsOrigins }
+    : config.nodeEnv === "production"
+      ? { origin: false }
+      : {};
+app.use(cors(corsOptions));
+
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => req.path === "/health" || req.path === "/ready"
+  })
+);
+
+const logger = pino({ level: config.logLevel });
+app.use(
+  pinoHttp({
+    logger,
+    genReqId: (req) => (req.headers["x-request-id"] as string) || crypto.randomUUID()
+  })
+);
+
 app.use(express.json({ limit: "2mb" }));
-app.use((req: Request, _res: Response, next: NextFunction) => {
-  console.info(`${req.method} ${req.path}`);
-  next();
-});
 
 app.get("/health", (_req: Request, res: Response) => {
+  res.status(200).json({ status: "ok" });
+});
+
+app.get("/ready", async (_req: Request, res: Response) => {
+  const ok = await healthCheck();
+  if (!ok) {
+    return res.status(503).json({ status: "unhealthy", message: "Database unreachable" });
+  }
   res.status(200).json({ status: "ok" });
 });
 
