@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { config } from "../config";
 import { getSupabaseAdminClient } from "../db/client";
 import { AppError } from "../errors";
+import { sendTransactionalEmail } from "./emailService";
 
 export type PushPlatform = "ios" | "android" | "web";
 
@@ -162,5 +163,19 @@ export async function sendEmail(userId: string, notification: EmailNotification)
     return;
   }
 
-  await logNotification(userId, { type: notification.type, status: "sent", targetDate: notification.targetDate });
+  const admin = getSupabaseAdminClient();
+  const { data: userData, error: userError } = await admin.auth.admin.getUserById(userId);
+  if (userError || !userData?.user?.email) {
+    await logNotification(userId, { type: notification.type, status: "failed", targetDate: notification.targetDate });
+    return;
+  }
+
+  const result = await sendTransactionalEmail(userData.user.email, notification.subject, notification.body);
+  const status = result.sent ? "sent" : "failed";
+  await logNotification(userId, {
+    type: notification.type,
+    status,
+    targetDate: notification.targetDate,
+    providerMessageId: result.messageId
+  });
 }
