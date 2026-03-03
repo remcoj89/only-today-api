@@ -73,6 +73,14 @@ function requireEnv(key: string): string {
   return value;
 }
 
+function parseCorsOrigins(): string[] {
+  const raw = process.env.CORS_ORIGINS ?? "";
+  return raw
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+}
+
 export const config: AppConfig = {
   supabaseUrl: requireEnv("SUPABASE_URL"),
   supabaseAnonKey: requireEnv("SUPABASE_ANON_KEY"),
