@@ -6,10 +6,10 @@ import pino from "pino";
 import pinoHttp from "pino-http";
 import rateLimit from "express-rate-limit";
 import { config } from "./config";
+import { healthCheck } from "./db/client";
 import { errorHandler } from "./errors";
 import { authMiddleware } from "./middleware/auth";
 import { routes } from "./routes";
-import { config } from "./config";
 
 export const app: Application = express();
 

@@ -8,6 +8,11 @@ export type AppConfig = {
   databaseUrl: string;
   nodeEnv: string;
   trustProxy: boolean;
+  enableScheduler: boolean;
+  corsOrigins: string[];
+  logLevel: string;
+  resendApiKey: string | undefined;
+  resendFromEmail: string;
 };
 
 function parseBooleanEnv(value: string | undefined, defaultValue: boolean): boolean {
@@ -87,5 +92,10 @@ export const config: AppConfig = {
   supabaseServiceRoleKey: requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
   databaseUrl: requireEnv("DATABASE_URL"),
   nodeEnv: process.env.NODE_ENV ?? "development",
-  trustProxy: parseBooleanEnv(process.env.TRUST_PROXY, true)
+  trustProxy: parseBooleanEnv(process.env.TRUST_PROXY, true),
+  enableScheduler: parseBooleanEnv(process.env.ENABLE_SCHEDULER, true),
+  corsOrigins: parseCorsOrigins(),
+  logLevel: process.env.LOG_LEVEL ?? "info",
+  resendApiKey: process.env.RESEND_API_KEY ?? undefined,
+  resendFromEmail: process.env.RESEND_FROM_EMAIL ?? "noreply@example.com"
 };
