@@ -7,12 +7,24 @@ export type AppConfig = {
   supabaseServiceRoleKey: string;
   databaseUrl: string;
   nodeEnv: string;
-  enableScheduler: boolean;
-  corsOrigins: string[];
-  logLevel: string;
-  resendApiKey: string | null;
-  resendFromEmail: string;
+  trustProxy: boolean;
 };
+
+function parseBooleanEnv(value: string | undefined, defaultValue: boolean): boolean {
+  if (!value) {
+    return defaultValue;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if (["1", "true", "yes", "on"].includes(normalized)) {
+    return true;
+  }
+  if (["0", "false", "no", "off"].includes(normalized)) {
+    return false;
+  }
+
+  return defaultValue;
+}
 
 function loadEnvFileIfPresent(filePath: string): void {
   if (!existsSync(filePath)) {
@@ -75,9 +87,5 @@ export const config: AppConfig = {
   supabaseServiceRoleKey: requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
   databaseUrl: requireEnv("DATABASE_URL"),
   nodeEnv: process.env.NODE_ENV ?? "development",
-  enableScheduler: process.env.ENABLE_SCHEDULER !== "false",
-  corsOrigins: parseCorsOrigins(),
-  logLevel: process.env.LOG_LEVEL ?? "info",
-  resendApiKey: process.env.RESEND_API_KEY ?? null,
-  resendFromEmail: process.env.RESEND_FROM_EMAIL ?? "Only Today <onboarding@resend.dev>"
+  trustProxy: parseBooleanEnv(process.env.TRUST_PROXY, true)
 };
