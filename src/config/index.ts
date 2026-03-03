@@ -7,7 +7,24 @@ export type AppConfig = {
   supabaseServiceRoleKey: string;
   databaseUrl: string;
   nodeEnv: string;
+  trustProxy: boolean;
 };
+
+function parseBooleanEnv(value: string | undefined, defaultValue: boolean): boolean {
+  if (!value) {
+    return defaultValue;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if (["1", "true", "yes", "on"].includes(normalized)) {
+    return true;
+  }
+  if (["0", "false", "no", "off"].includes(normalized)) {
+    return false;
+  }
+
+  return defaultValue;
+}
 
 function loadEnvFileIfPresent(filePath: string): void {
   if (!existsSync(filePath)) {
@@ -61,5 +78,6 @@ export const config: AppConfig = {
   supabaseAnonKey: requireEnv("SUPABASE_ANON_KEY"),
   supabaseServiceRoleKey: requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
   databaseUrl: requireEnv("DATABASE_URL"),
-  nodeEnv: process.env.NODE_ENV ?? "development"
+  nodeEnv: process.env.NODE_ENV ?? "development",
+  trustProxy: parseBooleanEnv(process.env.TRUST_PROXY, true)
 };

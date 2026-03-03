@@ -5,8 +5,11 @@ import helmet from "helmet";
 import { errorHandler } from "./errors";
 import { authMiddleware } from "./middleware/auth";
 import { routes } from "./routes";
+import { config } from "./config";
 
 export const app: Application = express();
+
+app.set("trust proxy", config.trustProxy);
 
 app.use(helmet());
 app.use(cors());
