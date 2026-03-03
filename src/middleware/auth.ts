@@ -14,10 +14,8 @@ const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 
 function getClientIdentifier(req: Request): string {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded === "string" && forwarded.length > 0) {
-    return forwarded.split(",")[0].trim();
-  }
+  // Use Express-computed IP to avoid trusting spoofable headers directly.
+  // `req.ip` respects `app.set("trust proxy", ...)`.
   return req.ip ?? "unknown";
 }
 
@@ -86,7 +84,7 @@ export async function authMiddleware(req: Request, _res: Response, next: NextFun
   const skipRateLimit =
     isUnreliableIdentifier(identifier) || (config.nodeEnv === "development" && isLocalhost(identifier));
   if (!skipRateLimit && isRateLimited(identifier)) {
-    return next(AppError.rateLimited());
+    return next(AppError.rateLimited("Too many authentication attempts. Try again later."));
   }
 
   const authHeader = req.header("authorization");

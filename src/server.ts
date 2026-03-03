@@ -5,14 +5,23 @@ import helmet from "helmet";
 import { errorHandler } from "./errors";
 import { authMiddleware } from "./middleware/auth";
 import { routes } from "./routes";
+import { config } from "./config";
 
 export const app: Application = express();
 
+app.set("trust proxy", config.trustProxy);
+
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: config.corsOrigins.length > 0 ? config.corsOrigins : true,
+  })
+);
 app.use(express.json({ limit: "2mb" }));
 app.use((req: Request, _res: Response, next: NextFunction) => {
-  console.info(`${req.method} ${req.path}`);
+  if (config.logLevel === "debug" || config.logLevel === "info") {
+    console.info(`${req.method} ${req.path}`);
+  }
   next();
 });
 

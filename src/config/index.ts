@@ -7,7 +7,48 @@ export type AppConfig = {
   supabaseServiceRoleKey: string;
   databaseUrl: string;
   nodeEnv: string;
+  trustProxy: boolean;
+  enableScheduler: boolean;
+  corsOrigins: string[];
+  logLevel: "debug" | "info" | "warn" | "error";
+  resendApiKey?: string;
+  resendFromEmail?: string;
 };
+
+function parseBooleanEnv(value: string | undefined, defaultValue: boolean): boolean {
+  if (!value) {
+    return defaultValue;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if (["1", "true", "yes", "on"].includes(normalized)) {
+    return true;
+  }
+  if (["0", "false", "no", "off"].includes(normalized)) {
+    return false;
+  }
+
+  return defaultValue;
+}
+
+function parseListEnv(value: string | undefined): string[] {
+  if (!value) {
+    return [];
+  }
+
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+function parseLogLevel(value: string | undefined): AppConfig["logLevel"] {
+  const normalized = value?.trim().toLowerCase();
+  if (normalized === "debug" || normalized === "warn" || normalized === "error") {
+    return normalized;
+  }
+  return "info";
+}
 
 function loadEnvFileIfPresent(filePath: string): void {
   if (!existsSync(filePath)) {
@@ -61,5 +102,11 @@ export const config: AppConfig = {
   supabaseAnonKey: requireEnv("SUPABASE_ANON_KEY"),
   supabaseServiceRoleKey: requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
   databaseUrl: requireEnv("DATABASE_URL"),
-  nodeEnv: process.env.NODE_ENV ?? "development"
+  nodeEnv: process.env.NODE_ENV ?? "development",
+  trustProxy: parseBooleanEnv(process.env.TRUST_PROXY, true),
+  enableScheduler: parseBooleanEnv(process.env.ENABLE_SCHEDULER, true),
+  corsOrigins: parseListEnv(process.env.CORS_ORIGINS),
+  logLevel: parseLogLevel(process.env.LOG_LEVEL),
+  resendApiKey: process.env.RESEND_API_KEY,
+  resendFromEmail: process.env.RESEND_FROM_EMAIL,
 };

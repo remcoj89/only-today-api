@@ -8,7 +8,9 @@ const server = app.listen(port, () => {
   console.info(`API server listening on port ${port} (${config.nodeEnv})`);
 });
 
-startScheduler();
+if (config.enableScheduler) {
+  startScheduler();
+}
 
 const shutdown = () => {
   console.info("Shutting down API server");
